@@ -1,0 +1,32 @@
+# netlify.toml
+
+# Define custom headers for all routes
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevent clickjacking by forbidding iframe embedding
+    X-Frame-Options = "DENY"
+    
+    # Force browsers to strictly use HTTPS
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    
+    # Prevent MIME-type sniffing
+    X-Content-Type-Options = "nosniff"
+    
+    # Protect referral data
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (CSP) tailored for Nastavnik's CDNs
+    # Allows scripts from jsdelivr, polyfill, and cloudflare
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://polyfill.io https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; connect-src 'self' data: blob: https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; worker-src 'self' blob:;"
+
+# Cache Control for static assets (optional but recommended for speed)
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

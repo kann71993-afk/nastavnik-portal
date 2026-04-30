@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nastavnik - Professional Assessment Portal</title>
+    
+    <meta name="theme-color" content="#1e293b">
+    <link rel="manifest" href="./manifest.json">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Nastavnik">
+    <link rel="apple-touch-icon" href="./icon-192x192.png">
+    
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div id="premium-splash">
+        <div class="splash-logo-text">Nastavnik</div>
+    </div>
+
+    <div class="top-controls" id="top-controls-bar" style="display: none;">
+        <div>
+            <label style="margin-bottom: 0; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; margin-right: 5px;">Font:</label>
+            <select id="font-selector" onchange="changeFont()" style="width: auto; padding: 6px 10px; border-radius: 4px; font-size: 13px; border: 1px solid #cbd5e1; background: #f8fafc;">
+                <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">System Default</option>
+                <option value="'AnjaliOldLipi', 'Manjari', sans-serif">Malayalam (Old Lipi)</option>
+                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                <option value="Arial, Helvetica, sans-serif">Arial / Helvetica</option>
+                <option value="Georgia, serif">Georgia</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+            <button type="button" onclick="toggleNightMode()" id="night-mode-btn" class="btn-small" style="margin: 0; border: 1px solid #cbd5e1 !important; background: #f8fafc !important; color: #0f172a !important;">◐ Dark Mode</button>
+        </div>
+    </div>
+
+    <div id="landing-section">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Nastavnik</h1>
+            <p class="dashboard-subtitle">Operational Module Selection | Internal Access Only</p>
+        </div>
+        
+        <button type="button" class="btn-primary dash-instruction-btn" onclick="openModal('instruction-modal')" style="margin-top: 0; margin-bottom: 20px;">
+            <span style="margin-right:8px;">ⓘ</span> Documentation & Protocol
+        </button>
+        
+        <div class="dashboard-cards">
+            <div class="dash-card" onclick="openBuilder('MCQ')">
+                <div class="dash-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                    </svg>
+                </div>
+                <h3>Assessment Architect</h3>
+                <p>Develop, validate, and secure high-stakes multiple-choice assessments.</p>
+            </div>
+
+            <div class="dash-card" onclick="openBuilder('DESC')">
+                <div class="dash-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h3>Descriptive Architect</h3>
+                <p>Author essay-style questions and comprehensive grading rubrics.</p>
+            </div>
+            
+            <div class="dash-card" onclick="openJournal()">
+                <div class="dash-icon">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </div>
+                <h3>Strategic Ledger</h3>
+                <p>Chronicle technical observations and daily operational insights.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="journal-section">
+        <div class="journal-header">
+            <button type="button" class="btn-small" onclick="navMonth(-1)">⟵ Prev Month</button>
+            <h3 id="month-year-display"></h3>
+            <button type="button" class="btn-small" onclick="navMonth(1)">Next Month ⟶</button>
+        </div>
+        
+        <div style="text-align: right; margin-bottom: 15px;">
+            <button type="button" class="btn-small" onclick="exportLedger()" style="background: #0ea5e9 !important; color: #fff !important; border-color: #0ea5e9 !important; padding: 8px 15px !important;">⭳ Export Ledger to File</button>
+        </div>
+        
+        <div class="journal-list" id="journal-list-container"></div>
+
+        <button type="button" class="btn-full btn-primary" onclick="showLandingPage()" style="margin-top: 30px;">⟵ Return to Hub</button>
+    </div>
+
+    <div id="instruction-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <h2 style="border-bottom: 2px solid currentColor; padding-bottom: 10px; margin-bottom: 20px;">System Instructions</h2>
+            <div style="font-size: 14px; text-align: left; max-height: 55vh; overflow-y: auto; padding-right: 10px; line-height: 1.6;">
+                
+                <h3 style="margin-top: 0; font-size: 16px;">1. Dashboard Navigation</h3>
+                <p style="margin-top: 5px;"><b>Assessment Architect:</b> Enter this module to author MCQ questions, format text, define scoring, and securely export your professional assessments.</p>
+                <p style="margin-top: 5px;"><b>Descriptive Architect:</b> Enter this module to author essay questions and set up grading rubrics. You can mix both types in the same vault.</p>
+                <p style="margin-top: 5px; margin-bottom: 20px;"><b>Strategic Ledger:</b> A dedicated daily quick-journal. Your entries auto-save immediately to your browser.</p>
+
+                <h3 style="margin-top: 0; font-size: 16px; border-top: 1px solid #cbd5e1; padding-top: 20px;">2. Authoring & Formatting</h3>
+                <p style="margin-top: 5px;">Use the <b>Text Style</b> buttons to apply bold, italic, or underline formats. Utilize the <b>List</b> controls to automatically generate perfectly aligned nested lists within any question, explanation, or case study.</p>
+                <p style="margin-top: 5px;"><b>Text Alignment:</b> Highlight text and use the <b>Alignment</b> buttons (L, C, R, J). This will inject tags like <code>[align-center]</code> which the engine will perfectly render as aligned blocks on the output screen.</p>
+                
+                <h3 style="font-size: 16px; margin-top: 20px;">3. Advanced Input Tools</h3>
+                <p style="margin-top: 5px;"><b>OCR Scanner:</b> Click the scan button to upload an image and seamlessly extract its text directly into the active text area.</p>
+                <p style="margin-top: 5px;"><b>Custom Tables:</b> Deploy Standard Tables for regular grids or Pro Tables for advanced accounting formats.</p>
+
+                <h3 style="font-size: 16px; margin-top: 20px;">4. Security & Deployment</h3>
+                <p style="margin-top: 5px;"><b>Data Persistence:</b> The application autosaves locally using IndexedDB. To securely back up your data or distribute an exam, click EXPORT SECURE and define a password. Use <b>Import File</b> to load pre-built exam structures.</p>
+            </div>
+            <div class="modal-buttons" style="margin-top: 25px;">
+                <button type="button" class="btn-primary" onclick="closeModal('instruction-modal')">Close Guide</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="student-auth-modal" class="modal-overlay">
+        <div class="modal-box" style="text-align: center;">
+            <h2 style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg> Exam Locked
+            </h2>
+            <p style="color: #334155; margin-bottom: 25px; font-size: 14px;">The examiner has secured this test. Enter the access key to begin.</p>
+            <input type="password" id="student-password-input" placeholder="Access Key" onkeypress="if(event.key === 'Enter') submitStudentAuth();" style="text-align: center; letter-spacing: 2px;">
+            <div id="student-auth-error" class="error"></div>
+            <div class="modal-buttons">
+                <button type="button" onclick="closeModal('student-auth-modal')">Cancel</button>
+                <button type="button" class="btn-primary" onclick="submitStudentAuth()">Unlock Exam</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="cropper-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 100%; max-width: 650px; display: flex; flex-direction: column; align-items: center; padding: 20px;">
+            <h2 style="margin-bottom: 20px; text-align: center;">Define Target Image Area</h2>
+            <div style="width: 100%; height: 50vh; max-height: 350px; overflow: hidden; background: #e2e8f0; border-radius: 4px; border: 1px solid #000;">
+                <img id="cropper-image" style="max-width: 100%; display: block;">
+            </div>
+            <div class="modal-buttons" style="width: 100%; justify-content: center;">
+                <button type="button" id="btn-crop-scan" class="btn-primary">⛶ Confirm Crop</button>
+                <button type="button" onclick="closeModal('cropper-modal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="std-table-modal" class="modal-overlay">
+        <div class="modal-box std-table-modal">
+            <h2>⊞ Standard Table Builder</h2>
+            <p style="font-size: 12px; color: #64748b; margin-top: -10px;">A clean, simple grid. Press 'Enter' inside a box to create multi-line text and bullet points.</p>
+            <div class="tb-control-row">
+                <div><label>Rows:</label><input type="number" id="std-rows" value="3" min="1" max="20"></div>
+                <div><label>Columns:</label><input type="number" id="std-cols" value="3" min="1" max="15"></div>
+                <div><button type="button" class="btn-primary" onclick="generateStdGrid()" style="width: 100%; padding: 12px; margin-top: 22px;">Update Grid</button></div>
+                <div><button type="button" class="btn-small" onclick="restoreStdState()" style="width: 100%; padding: 12px; margin-top: 22px; border-style: dashed !important; color: #0ea5e9 !important; border-color: #0ea5e9 !important;">↺ Restore Last</button></div>
+            </div>
+            <div id="std-grid-area" class="tb-grid-container"></div>
+            <div class="edit-tip">💡 <b>BULLET TIP:</b> Type "-" or "•" and press Enter to make neat bulleted lists inside any cell!</div>
+            <div class="modal-buttons">
+                <button type="button" onclick="closeModal('std-table-modal')">Cancel</button>
+                <button type="button" class="btn-primary" onclick="injectStdTable()">⭳ Inject Table</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pro-table-modal" class="modal-overlay">
+        <div class="modal-box pro-table-modal">
+            <h2>📋 Pro Table Generator</h2>
+            <p style="font-size: 12px; color: #64748b; margin-top: -10px;">Advanced controls for accounting formats (no internal borders by default).</p>
+            <div class="tb-control-row">
+                <div><label>Rows:</label><input type="number" id="pt-rows" value="3" min="1" max="20"></div>
+                <div><label>Columns:</label><input type="number" id="pt-cols" value="3" min="1" max="15"></div>
+                <div><button type="button" class="btn-primary" onclick="generateProGrid()" style="width: 100%; padding: 12px; margin-top: 22px;">Update Grid</button></div>
+                <div><button type="button" class="btn-small" onclick="restoreProState()" style="width: 100%; padding: 12px; margin-top: 22px; border-style: dashed !important; color: #0ea5e9 !important; border-color: #0ea5e9 !important;">↺ Restore Last</button></div>
+            </div>
+            <div id="pt-grid-area" class="tb-grid-container"></div>
+            <div class="edit-tip">💡 <b>CELL HEADERS:</b> Use the "Bg: GRAY" toggle on individual cells to create top-headers or side-headers!</div>
+            <div class="modal-buttons">
+                <button type="button" onclick="closeModal('pro-table-modal')">Cancel</button>
+                <button type="button" class="btn-primary" onclick="injectProTable()">⭳ Inject Table</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="builder-section">
+        
+        <h2 id="form-title" style="border-bottom: 2px solid #000; padding-bottom: 10px;">Author Question #<span id="current-q-num">1</span></h2>
+        
+        <button type="button" class="btn-full toggle-btn" onclick="togglePassage()" id="toggle-passage-btn">➕ Add Reference Material (Case Study)</button>
+        
+        <div class="scenario-section" id="passage-container" style="display: none;">
+            <p style="font-size: 13px; margin-top: 0; margin-bottom: 15px;">For interconnected case studies. Formatting permitted.</p>
+            <div class="form-group">
+                <div class="format-toolbar-container">
+                    <div class="format-group-row">
+                        <div class="format-sub-group">
+                            <span class="format-label">Text Style</span>
+                            <div class="format-btn-row">
+                                <button type="button" class="format-btn" onclick="formatText('bold', 'passage-text')" title="Bold"><b>B</b></button>
+                                <button type="button" class="format-btn" onclick="formatText('italic', 'passage-text')" title="Italic"><i>I</i></button>
+                                <button type="button" class="format-btn" onclick="formatText('underline', 'passage-text')" title="Underline"><u>U</u></button>
+                            </div>
+                        </div>
+                        <div class="format-sub-group">
+                            <span class="format-label">Alignment</span>
+                            <div class="format-btn-row">
+                                <button type="button" class="format-btn" onclick="formatText('align-left', 'passage-text')" title="Align Left">L</button>
+                                <button type="button" class="format-btn" onclick="formatText('align-center', 'passage-text')" title="Align Center">C</button>
+                                <button type="button" class="format-btn" onclick="formatText('align-right', 'passage-text')" title="Align Right">R</button>
+                                <button type="button" class="format-btn" onclick="formatText('align-justify', 'passage-text')" title="Justify">J</button>
+                            </div>
+                        </div>
+                        <div class="format-sub-group">
+                            <span class="format-label">List</span>
+                            <div class="format-btn-row">
+                                <button type="button" class="format-btn" onclick="indentList('passage-text')" style="width: auto;" title="Create a nested sub-bullet">→ Indent (Sub-bullet)</button>
+                                <button type="button" class="format-btn" onclick="outdentList('passage-text')" style="width: auto;" title="Return to main bullet">← Outdent (Main bullet)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <textarea id="passage-text" rows="4" placeholder="Input contextual text/case study..." oninput="saveDraft()"></textarea>
+                <div class="btn-toolbar">
+                    <button type="button" class="btn-ocr-scan" onclick="document.getElementById('ocr-passage-upload').click()">⌕ Scan Text</button>
+                    <button type="button" class="btn-ocr-scan" onclick="openModal('std-table-modal', 'passage-text')">⊞ Standard Table</button>
+                    <button type="button" class="btn-ocr-scan" onclick="openModal('pro-table-modal', 'passage-text')">📋 Pro Table Builder</button>
+                </div>
+                <input type="file" id="ocr-passage-upload" accept="image/*" style="display:none;" onchange="openCropper(event, 'passage-text', 'ocr-status-passage')">
+                <span id="ocr-status-passage" style="font-size: 12px; font-weight: bold; margin-left: 10px;"></span>
+            </div>
+            
+            <div class="form-group">
+                <label>Attach Reference Exhibit:</label>
+                <input type="file" id="passage-image" class="standard-file" accept="image/*" onchange="previewPassageImage(event)">
+                <button type="button" class="btn-small" onclick="clearPassageImage()" id="clear-passage-image-btn" style="display: none; margin-top: 10px;">⨉ Remove Exhibit</button>
+                <img id="passage-image-preview" class="q-image-display" src="" style="display: none;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Primary Inquiry:</label>
+            <div class="format-toolbar-container">
+                <div class="format-group-row">
+                    <div class="format-sub-group">
+                        <span class="format-label">Text Style</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('bold', 'question-text')" title="Bold"><b>B</b></button>
+                            <button type="button" class="format-btn" onclick="formatText('italic', 'question-text')" title="Italic"><i>I</i></button>
+                            <button type="button" class="format-btn" onclick="formatText('underline', 'question-text')" title="Underline"><u>U</u></button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">Alignment</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('align-left', 'question-text')" title="Align Left">L</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-center', 'question-text')" title="Align Center">C</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-right', 'question-text')" title="Align Right">R</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-justify', 'question-text')" title="Justify">J</button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">List</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="indentList('question-text')" style="width: auto;" title="Create a nested sub-bullet">→ Indent (Sub-bullet)</button>
+                            <button type="button" class="format-btn" onclick="outdentList('question-text')" style="width: auto;" title="Return to main bullet">← Outdent (Main bullet)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <textarea id="question-text" rows="4" placeholder="Input definitive question text..." oninput="saveDraft()"></textarea>
+            <div class="btn-toolbar">
+                <button type="button" class="btn-ocr-scan" onclick="document.getElementById('ocr-question-upload').click()">⌕ Scan Text</button>
+                <button type="button" class="btn-ocr-scan" onclick="openModal('std-table-modal', 'question-text')">⊞ Standard Table</button>
+                <button type="button" class="btn-ocr-scan" onclick="openModal('pro-table-modal', 'question-text')">📋 Pro Table Builder</button>
+            </div>
+            <input type="file" id="ocr-question-upload" accept="image/*" style="display:none;" onchange="openCropper(event, 'question-text', 'ocr-status-question')">
+            <span id="ocr-status-question" style="font-size: 12px; font-weight: bold; margin-left: 10px;"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Attach Inquiry Exhibit:</label>
+            <input type="file" id="q-image" class="standard-file" accept="image/*" onchange="previewImage(event)">
+            <button type="button" class="btn-small" onclick="clearImage()" id="clear-image-btn" style="display: none; margin-top: 10px;">⨉ Remove Exhibit</button>
+            <img id="image-preview" class="q-image-display" src="" style="display: none;">
+        </div>
+
+        <div class="form-group" id="mcq-options-group" style="background: #f1f5f9; padding: 15px; border-radius: 4px; border: 1px solid #cbd5e1;">
+            <label style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                Permitted Options & Solution Marking:
+                <div style="display: flex; gap: 5px;">
+                    <button type="button" class="btn-small" onclick="addOption()">+ Add Option</button>
+                    <button type="button" class="btn-small" onclick="removeOption()">- Remove Option</button>
+                </div>
+            </label>
+            <p style="font-size: 12px; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Select the radio button next to an option to mark it as the Correct Answer. Multi-line text is supported.</p>
+            <div id="dynamic-options-container"></div>
+        </div>
+        
+        <div class="scoring-box">
+            <div style="flex: 1 1 45%; min-width: 200px;">
+                <label>Marks Awarded (Default 1):</label>
+                <input type="number" id="q-points" placeholder="e.g. 2" step="0.5" min="0.5" oninput="saveDraft()">
+            </div>
+            <div style="flex: 1 1 45%; min-width: 200px;" id="neg-scoring-group">
+                <label>Negative Penalty (Decimal Multiplier):</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="q-negative" placeholder="e.g. 0.25" onfocus="if(this.value==='') this.value='0.';" onblur="if(this.value==='0.') this.value='';" oninput="formatPenalty(this)">
+                    <button type="button" class="btn-small" onclick="applyScoringToAll()" style="margin: 0; padding: 0 10px !important; white-space: nowrap;" title="Apply this scoring rule to all saved questions">Apply to Vault</button>
+                </div>
+                <p style="font-size: 11px; color: #64748b; margin-top: 5px; margin-bottom: 0;">e.g. 0.25 deducts 25% of the mark on a wrong answer. Max 4 decimals.</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label id="correct-exp-label">Correct Answer Rationale (Optional):</label>
+            <div class="format-toolbar-container">
+                <div class="format-group-row">
+                    <div class="format-sub-group">
+                        <span class="format-label">Text Style</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('bold', 'explanation')" title="Bold"><b>B</b></button>
+                            <button type="button" class="format-btn" onclick="formatText('italic', 'explanation')" title="Italic"><i>I</i></button>
+                            <button type="button" class="format-btn" onclick="formatText('underline', 'explanation')" title="Underline"><u>U</u></button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">Alignment</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('align-left', 'explanation')" title="Align Left">L</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-center', 'explanation')" title="Align Center">C</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-right', 'explanation')" title="Align Right">R</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-justify', 'explanation')" title="Justify">J</button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">List</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="indentList('explanation')" style="width: auto;" title="Create a nested sub-bullet">→ Indent (Sub-bullet)</button>
+                            <button type="button" class="format-btn" onclick="outdentList('explanation')" style="width: auto;" title="Return to main bullet">← Outdent (Main bullet)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <textarea id="explanation" rows="3" placeholder="Explain the rationale/rubric..." oninput="saveDraft()"></textarea>
+        </div>
+        
+        <div class="form-group" id="wrong-exp-group">
+            <label>Incorrect Options Rationale (Optional):</label>
+            <div class="format-toolbar-container">
+                <div class="format-group-row">
+                    <div class="format-sub-group">
+                        <span class="format-label">Text Style</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('bold', 'explanation-wrong')" title="Bold"><b>B</b></button>
+                            <button type="button" class="format-btn" onclick="formatText('italic', 'explanation-wrong')" title="Italic"><i>I</i></button>
+                            <button type="button" class="format-btn" onclick="formatText('underline', 'explanation-wrong')" title="Underline"><u>U</u></button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">Alignment</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('align-left', 'explanation-wrong')" title="Align Left">L</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-center', 'explanation-wrong')" title="Align Center">C</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-right', 'explanation-wrong')" title="Align Right">R</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-justify', 'explanation-wrong')" title="Justify">J</button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">List</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="indentList('explanation-wrong')" style="width: auto;" title="Create a nested sub-bullet">→ Indent (Sub-bullet)</button>
+                            <button type="button" class="format-btn" onclick="outdentList('explanation-wrong')" style="width: auto;" title="Return to main bullet">← Outdent (Main bullet)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <textarea id="explanation-wrong" rows="3" placeholder="Why are the other options incorrect/traps?" oninput="saveDraft()"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <button type="button" id="save-btn" class="btn-full btn-primary" onclick="saveQuestion(false)" style="flex: 1 1 60%;">Commit Question</button>
+            <button type="button" id="save-keep-btn" class="btn-full" onclick="saveQuestion(true)" style="flex: 1 1 30%; border-style: dashed !important; font-size: 11px;">Commit & Keep Context</button>
+        </div>
+        <button type="button" id="cancel-btn" class="btn-full" style="display: none; border-style: dashed !important;" onclick="cancelEdit()">Abort Edit</button>
+        <div id="error-msg" class="error"></div>
+
+        <button type="button" class="btn-full toggle-btn" onclick="openSettings()" style="margin-top: 30px; border-style: dashed !important; border-width: 2px !important; color: #0369a1 !important; border-color: #0ea5e9 !important; background: #e0f2fe !important; display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg> 
+            Configure Exam & Export Files
+        </button>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <button type="button" class="btn-full" onclick="showLandingPage()" style="margin-top: 0;">⟵ Return to Hub</button>
+            <button type="button" class="btn-full" onclick="accessQs()" style="margin-top: 0;">☰ Open Question Vault (<span id="vault-total-count">0</span>)</button>
+            <button type="button" id="start-test-btn" class="btn-full btn-primary" onclick="startTest()" disabled style="margin-top: 0;">⯈ Initiate Simulation [ <span id="btn-total-count">0</span> ]</button>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <button type="button" class="btn-small" onclick="clearAllData()" style="border-style: dashed !important; color: #dc2626 !important; border-color: #dc2626 !important;">⨉ Wipe Local Database</button>
+        </div>
+    </div>
+
+    <div id="settings-section">
+        <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Configuration & Export
+        </h2>
+        <p style="font-size: 14px; color: #475569;">These settings apply globally to the entire assessment file when exported.</p>
+        
+        <div class="security-box">
+            <label class="label-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #eab308;">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg> 
+                File Security
+            </label>
+            <p style="font-size: 12px; margin-top: 0;">Require students to enter a password to access this test. Leave blank for no password.</p>
+            <input type="text" id="exam-lock-pwd" placeholder="Set Student Access Password..." onchange="updateExamSettingsUI()">
+            
+            <label class="label-icon" style="margin-top: 15px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f97316;">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg> 
+                Examination Title (Optional)
+            </label>
+            <p style="font-size: 12px; margin-top: 0; color: #475569;">Specify the official title of this assessment. It will auto-fill on the candidate's dashboard.</p>
+            <input type="text" id="exam-title-input" style="font-weight: bold;" placeholder="Enter Examination Title..." onchange="updateExamSettingsUI()">
+
+            <label class="label-icon" style="margin-top: 15px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #3b82f6;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+                </svg> 
+                Examination Instructions (Optional)
+            </label>
+            <p style="font-size: 12px; margin-top: 0; color: #475569;">Provide specific instructions, rules, or guidelines for this assessment. They will be dynamically displayed to the candidate upon file upload.</p>
+            
+            <div class="format-toolbar-container">
+                <div class="format-group-row">
+                    <div class="format-sub-group">
+                        <span class="format-label">Text Style</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('bold', 'exam-rules-input')" title="Bold"><b>B</b></button>
+                            <button type="button" class="format-btn" onclick="formatText('italic', 'exam-rules-input')" title="Italic"><i>I</i></button>
+                            <button type="button" class="format-btn" onclick="formatText('underline', 'exam-rules-input')" title="Underline"><u>U</u></button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">Alignment</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="formatText('align-left', 'exam-rules-input')" title="Align Left">L</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-center', 'exam-rules-input')" title="Align Center">C</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-right', 'exam-rules-input')" title="Align Right">R</button>
+                            <button type="button" class="format-btn" onclick="formatText('align-justify', 'exam-rules-input')" title="Justify">J</button>
+                        </div>
+                    </div>
+                    <div class="format-sub-group">
+                        <span class="format-label">List</span>
+                        <div class="format-btn-row">
+                            <button type="button" class="format-btn" onclick="indentList('exam-rules-input')" style="width: auto;" title="Create a nested sub-bullet">→ Indent</button>
+                            <button type="button" class="format-btn" onclick="outdentList('exam-rules-input')" style="width: auto;" title="Return to main bullet">← Outdent</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <textarea id="exam-rules-input" rows="4" placeholder="e.g. 1. No calculators allowed.&#10;2. Answer all questions.&#10;..." onchange="updateExamSettingsUI()"></textarea>
+
+            <label class="label-icon" style="margin-top: 15px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+                </svg> 
+                Set Strict Time Limit (HH:MM:SS)
+            </label>
+            <div class="time-inputs" style="margin-bottom: 15px;">
+                <input type="number" id="exam-time-h" placeholder="HH" min="0" onchange="updateExamSettingsUI()">
+                <span style="font-weight: bold; color: #475569;">:</span>
+                <input type="number" id="exam-time-m" placeholder="MM" min="0" max="59" onchange="updateExamSettingsUI()">
+                <span style="font-weight: bold; color: #475569;">:</span>
+                <input type="number" id="exam-time-s" placeholder="SS" min="0" max="59" onchange="updateExamSettingsUI()">
+            </div>
+            
+            <div class="file-controls">
+                <button type="button" class="btn-primary" onclick="exportData(false)">⭳ EXPORT JSON (RAW)</button>
+                <button type="button" class="btn-primary" onclick="exportData(true)">⭳ EXPORT SECURE (.ENC)</button>
+                <button type="button" onclick="document.getElementById('file-upload-builder').click()">⭱ IMPORT FILE</button>
+                <input type="file" id="file-upload-builder" accept=".json, .enc" style="display: none;" onchange="importData(event)">
+            </div>
+        </div>
+
+        <button type="button" class="btn-full" onclick="closeSettings()" style="margin-top: 20px;">⟵ Back to Builder</button>
+    </div>
+
+    <div id="qs-section">
+        <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Secure Vault</h2>
+        <div id="question-list-area"></div> 
+        <button type="button" class="btn-full" onclick="openBuilder(activeExamMode)">⟵ Return to Builder</button>
+    </div>
+
+    <div id="test-section">
+        <div id="exam-timer"></div>
+        <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Examination in Progress</h2>
+        <div id="test-area"></div>
+        <button type="button" class="btn-full btn-primary" onclick="submitTest()">Submit for Evaluation</button>
+        <button type="button" class="btn-full" onclick="showLandingPage()" style="border-style: dashed !important; margin-top: 10px;">⨉ Terminate Session</button>
+    </div>
+
+    <div id="result-section">
+        <h2 style="border-bottom: 2px solid #000; padding-bottom: 10px;">Evaluation Dashboard</h2>
+        
+        <div class="quote-box" style="margin-bottom: 30px;">
+            <span style="font-weight: bold;">[ DIRECTIVE ]</span> <span id="random-quote-text">Loading standard directive...</span>
+        </div>
+        
+        <div id="score-display"></div>
+        <button type="button" class="btn-full btn-primary" onclick="showLandingPage()" style="margin-top: 30px;">⟵ Return to Hub</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
